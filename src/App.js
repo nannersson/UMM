@@ -57,13 +57,18 @@ export default class App extends Component {
     } else metalCtx.fillRect(0, 0, canvas.width, canvas.height);
     if (this.state.aoMap) {
       aoCtx.drawImage(this.state.aoMap, 0, 0);
-    } else aoCtx.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+      aoCtx.fillStyle = 'white';
+      aoCtx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     if (this.state.detailMap) {
       detailCtx.drawImage(this.state.detailMap, 0, 0);
     } else detailCtx.fillRect(0, 0, canvas.width, canvas.height);
     if (this.state.roughnessMap) {
       roughCtx.drawImage(this.state.roughnessMap, 0, 0);
     } else roughCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+    document.body.appendChild(roughCtx.canvas);
 
     const metalData = metalCtx.getImageData(0, 0, canvas.width, canvas.height);
     const aoData = aoCtx.getImageData(0, 0, canvas.width, canvas.height);
