@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Unity Mask Mapper</title>
+    <link rel="stylesheet" href="index.css" />
+    <script src="fa.js"></script>
+    <script defer type="module" src="editor.js"></script>
+  </head>
+  <body>
+
+    <p id="sizeText" class="fixed top-0 left-0"></p>
+    
+    <div class="h-screen grid grid-cols-2 gap-2">
+      
+      <!-- mask -->
+      <div class="border-r border-neutral p-2">
+        <h1 class="text-3xl font-extrabold">Mask Map</h1>
+        <ul class="menu">
+          <li data-map="mask" data-id="metallic" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Metallic</p>
+              </div>
+            </div>
+          </li>
+          <li data-map="mask" data-id="occlusion" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Occlusion</p>
+              </div>
+            </div>
+          </li>
+          <li data-map="mask" data-id="detail" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Detail</p>
+              </div>
+            </div>
+          </li>
+          <li data-map="mask" data-id="smoothness" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Smoothness</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4">
+            <input id="maskSIR" type="checkbox" class="checkbox flex-none" />
+            <span class="label-text">Smoothness is Roughness</span> 
+          </label>
+        </div>
+        <button id="btnGenerateMask" class="btn btn-primary">Generate</button>
+      </div>
+
+      <!-- detail -->
+      <div class="p-2">
+        <h1 class="text-3xl font-extrabold">Detail Map</h1>
+        <ul class="menu">
+          <li data-map="detail" data-id="albedo" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Albedo</p>
+              </div>
+            </div>
+          </li>
+          <li data-map="detail" data-id="normal" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Normal</p>
+              </div>
+            </div>
+          </li>
+          <li data-map="detail" data-id="smoothness" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Smoothness</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4">
+            <input id="detailSIR" type="checkbox" class="checkbox flex-none" />
+            <span class="label-text">Smoothness is Roughness</span> 
+          </label>
+        </div>
+        <button id="btnGenerateDetail" class="btn btn-primary">Generate</button>
+      </div>
+
+    </div>
+
+    <button id="btnReload" class="btn btn-ghost fixed bottom-0 right-0"><i class="fas fa-sync"></i></button>
+
+  </body>
+</html>
