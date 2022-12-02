@@ -1,3 +1,5 @@
+const {ipcRenderer} = window.require("electron");
+
 import {BlackMap, Canvas, GenerateDetailMap, GenerateMaskMap, WhiteMap} from './Canvas.js';
 
 const inputs = document.querySelectorAll('.map-input');
@@ -6,6 +8,7 @@ const detailSIR = document.querySelector("#detailSIR");
 const btnGenerateMask = document.querySelector("#btnGenerateMask");
 const btnGenerateDetail = document.querySelector("#btnGenerateDetail");
 const btnReload = document.querySelector('#btnReload');
+const btnURP = document.querySelector('#btnURP');
 
 const state = {
     size: null,
@@ -95,3 +98,9 @@ btnGenerateDetail.addEventListener('click', () => {
 });
 
 btnReload.addEventListener("click", () => window.location.reload());
+
+btnURP.addEventListener("click", () => {
+
+    ipcRenderer.send("URP_WINDOW");
+
+});

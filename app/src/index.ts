@@ -11,6 +11,32 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+const createURPWindow = () => {
+
+  const _window = new BrowserWindow({
+    width: 262,
+    height: 273,
+    'useContentSize': true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  ipcMain.addListener("HDRP_WINDOW", ev => {
+    createMainWindow();
+    _window.close();
+  });
+
+  _window.on('close', () => {
+    ipcMain.removeAllListeners("HDRP_WINDOW");
+  });
+
+  _window.loadFile(path.join(__dirname, "urp.html"));
+  _window.webContents.openDevTools();
+
+}
+
 const createMainWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -20,6 +46,11 @@ const createMainWindow = () => {
       nodeIntegration: true,
       contextIsolation: false
     }
+  });
+
+  ipcMain.addListener("URP_WINDOW", ev => {
+    createURPWindow();
+    mainWindow.close();
   });
 
   ipcMain.addListener('SAVE_IMAGE', (ev, data) => {
@@ -46,7 +77,8 @@ const createMainWindow = () => {
   })
 
   mainWindow.on('close', () => {
-    ipcMain.removeAllListeners("SAVE_IMAGE");
+    // ipcMain.removeAllListeners("SAVE_IMAGE");
+    ipcMain.removeAllListeners("URP_WINDOW");
   });
 
   // and load the index.html of the app.

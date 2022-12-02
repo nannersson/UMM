@@ -33,6 +33,26 @@ if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
     electron_1.app.quit();
 }
+const createURPWindow = () => {
+    const _window = new electron_1.BrowserWindow({
+        width: 262,
+        height: 273,
+        'useContentSize': true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
+    electron_1.ipcMain.addListener("HDRP_WINDOW", ev => {
+        createMainWindow();
+        _window.close();
+    });
+    _window.on('close', () => {
+        electron_1.ipcMain.removeAllListeners("HDRP_WINDOW");
+    });
+    _window.loadFile(path.join(__dirname, "urp.html"));
+    _window.webContents.openDevTools();
+};
 const createMainWindow = () => {
     // Create the browser window.
     const mainWindow = new electron_1.BrowserWindow({
@@ -42,6 +62,10 @@ const createMainWindow = () => {
             nodeIntegration: true,
             contextIsolation: false
         }
+    });
+    electron_1.ipcMain.addListener("URP_WINDOW", ev => {
+        createURPWindow();
+        mainWindow.close();
     });
     electron_1.ipcMain.addListener('SAVE_IMAGE', (ev, data) => {
         const buffer = Buffer.from(data);
@@ -61,7 +85,8 @@ const createMainWindow = () => {
             .catch(console.error);
     });
     mainWindow.on('close', () => {
-        electron_1.ipcMain.removeAllListeners("SAVE_IMAGE");
+        // ipcMain.removeAllListeners("SAVE_IMAGE");
+        electron_1.ipcMain.removeAllListeners("URP_WINDOW");
     });
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, 'index.html'));

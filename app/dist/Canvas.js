@@ -154,6 +154,45 @@ export function GenerateDetailMap(size, albedo, normal, smoothness, sir) {
 
 }
 
+
+/**
+ * 
+ * @param {{w:number, h:number}} size 
+ * @param {Canvas} metallic 
+ * @param {Canvas} smoothness 
+ * @param {boolean} sir 
+ */
+export function GenerateURPMap(size, metallic, smoothness, sir) {
+
+    const metal = metallic.GetImageData();
+    const smooth = sir ? Invert(smoothness) : smoothness.GetImageData();
+
+    //urp map: smooth map goes into the metal maps A channel
+
+    for (let i = 0; i < size.w * size.h; i++) {
+
+        const index = i * 4; //r channel
+
+        metal.data[index+3] = smooth.data[index];
+
+    }
+
+    const newCanvas = new Canvas();
+    newCanvas.DrawImageData(metal);
+
+    newCanvas.canvas.toBlob(blob => {
+
+        blob.arrayBuffer()
+            .then(ab => {
+                const data = new Uint8Array(ab);
+                ipcRenderer.send("SAVE_IMAGE", data);
+            })
+            .catch(console.error);
+
+    });
+
+}
+
 /**
  * 
  * @param {{w:number,h:number}} size

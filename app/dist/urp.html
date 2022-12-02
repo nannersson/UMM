@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Unity Mask Mapper (URP)</title>
+    <link rel="stylesheet" href="index.css" />
+    <script src="fa.js"></script>
+    <script defer type="module" src="urpEditor.js"></script>
+  </head>
+  <body>
+
+    <p id="sizeText" class="fixed top-0 left-0"></p>
+    
+    <div class="border-r border-neutral p-2">
+        <h1 class="text-3xl font-extrabold">Standard URP</h1>
+        <ul class="menu">
+          <li data-id="metallic" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Metallic</p>
+              </div>
+            </div>
+          </li>
+          <li data-id="smoothness" class="map-input">
+            <div class="flex items-center">
+              <div class="flex-none">
+                <div class="avatar">
+                  <div class="w-8 border"></div>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p>Smoothness</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4">
+            <input id="SIR" type="checkbox" class="checkbox flex-none" />
+            <span class="label-text">Smoothness is Roughness</span> 
+          </label>
+        </div>
+        <button id="btnGenerate" class="btn btn-primary">Generate</button>
+      </div>
+
+      <div class="fixed bottom-0 right-0 p-1">
+        <button id="btnHDRP" class="btn btn-ghost">HDRP</button>
+        <button id="btnReload" class="btn btn-ghost"><i class="fas fa-sync"></i></button>
+      </div>
+
+  </body>
+</html>
