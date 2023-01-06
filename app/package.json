@@ -1,8 +1,8 @@
 {
-  "name": "app",
-  "productName": "app",
+  "name": "umm",
+  "productName": "Unity Mask Mapper",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Unity Helper Tools",
   "main": "dist/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -20,7 +20,9 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "./src/icon.ico"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
@@ -47,7 +49,8 @@
   },
   "dependencies": {
     "daisyui": "^2.42.1",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "node-image-resizer": "^1.0.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.3",

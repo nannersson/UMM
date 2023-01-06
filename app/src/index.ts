@@ -1,9 +1,12 @@
 // const { app, BrowserWindow } = require('electron');
 // const path = require('path');
 
-import {app, BrowserWindow, ipcMain, Menu, dialog} from 'electron';
-import { writeFileSync } from 'original-fs';
+import {app, BrowserWindow, ipcMain, Menu, dialog, Event} from 'electron';
+import { createReadStream, writeFileSync } from 'original-fs';
 import * as path from 'path';
+import { BatchResize, ResizeData } from './Batch';
+
+const _debug = false;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -33,7 +36,7 @@ const createURPWindow = () => {
   });
 
   _window.loadFile(path.join(__dirname, "urp.html"));
-  _window.webContents.openDevTools();
+  if (_debug) _window.webContents.openDevTools();
 
 }
 
@@ -85,11 +88,132 @@ const createMainWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (_debug) mainWindow.webContents.openDevTools();
 };
 
+const createResizeWindow = (parent:BrowserWindow) => {
 
-app.applicationMenu = Menu.buildFromTemplate([]);
+  const resizeWin = new BrowserWindow({
+    width: 320,
+    height: 372,
+    useContentSize: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    },
+    parent: parent,
+    modal: true,
+    maximizable: false,
+    minimizable: false
+  });
+
+  ipcMain.addListener("SELECT_FOLDER", (ev) => {
+
+    dialog.showOpenDialog(resizeWin, {
+      title: "Select Folder",
+      properties: ["openDirectory"]
+    })
+      .then(res => {
+        if (res.canceled) return;
+
+        ev.sender.send("SELECT_FOLDER", res.filePaths[0]);
+
+      })
+      .catch(console.error);
+
+  });
+
+  ipcMain.addListener("BATCH_RESIZE", (ev, data:ResizeData) => {
+
+    BatchResize(data, (done, total) => {
+
+      ev.sender.send("UPDATE_PROGRESS", [done, total]);
+
+    })
+      .then(() => {
+        resizeWin.close();
+      })
+      .catch(console.error);
+
+  });
+
+  resizeWin.on('close', () => {
+    ipcMain.removeAllListeners("SELECT_FOLDER");
+    ipcMain.removeAllListeners("BATCH_RESIZE");
+  });
+
+  resizeWin.setMenu(Menu.buildFromTemplate([]));
+
+  resizeWin.loadFile(path.join(__dirname, 'batchResize.html'));
+  if (_debug) resizeWin.webContents.openDevTools();
+
+}
+
+const createFlipNormalsWindow = (parent:BrowserWindow) => {
+
+  const flipWin = new BrowserWindow({
+    width: 320,
+    height: 123,
+    useContentSize: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    },
+    parent: parent,
+    modal: true,
+    maximizable: false,
+    minimizable: false
+  });
+
+  ipcMain.addListener("SAVE_FIMAGES", (ev, data:{path:string;buffer:Uint8Array}[]) => {
+
+    for (let i = 0; i < data.length; i++) {
+
+      const file = data[i];
+      const buffer = Buffer.from(file.buffer);
+
+      writeFileSync(file.path, buffer, 'binary');
+      ev.sender.send("UPDATE_PROGRESS", i+1);
+
+    }
+
+    setTimeout(() => {
+      flipWin.close();
+    }, 500);
+
+  });
+
+  flipWin.on('close', () => {
+    ipcMain.removeAllListeners("SAVE_FIMAGES");
+  });
+
+  flipWin.setMenu(Menu.buildFromTemplate([]));
+
+  flipWin.loadFile(path.join(__dirname, 'batchFlipNormals.html'));
+  if (_debug) flipWin.webContents.openDevTools();
+
+}
+
+
+app.applicationMenu = Menu.buildFromTemplate([
+  {
+    'label': 'File',
+    'submenu': [
+      {
+        'label': "Batch Resize",
+        'click': (item, window, ev) => {
+          createResizeWindow(window);
+        }
+      },
+      {
+        'label': "Flip Normals",
+        'click': (item, window, ev) => {
+          createFlipNormalsWindow(window);
+        }
+      }
+    ]
+  }
+]);
 
 
 // This method will be called when Electron has finished

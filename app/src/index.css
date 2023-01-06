@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#progressBar > .resize-progress {
+
+    --w: 0%;
+
+    width: var(--w);
+    height: 4px;
+    background: lime;
+
+    transition: 
+    0.2s ease;
+
+}

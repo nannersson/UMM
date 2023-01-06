@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Resize</title>
+
+    <link rel="stylesheet" href="index.css" />
+    <script src="fa.js"></script>
+    <script defer type="module" src="resize.js"></script>
+
+</head>
+<body>
+
+    <div id="progressBar">
+        <div class="resize-progress"></div>
+    </div>
+    
+    <div class="p-4">
+        <div class="form-control">
+            <label class="label"><span class="label-text">Folder</span></label>
+            <div class="input-group border border-base-300 rounded-md">
+                <input id="iFolder" type="text" disabled class="input w-full">
+                <button id="bSelectFolder" class="btn">...</button>
+            </div>
+        </div>
+        <div class="form-control">
+            <label class="label"><span class="label-text">Desired Resolution</span></label>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="input-group border border-base-300 rounded-md">
+                    <span>w</span>
+                    <input id="iWidth" type="number" min="2" max="4096" class="input w-full">
+                </div>
+                <div class="input-group border border-base-300 rounded-md">
+                    <span>h</span>
+                    <input id="iHeight" type="number" min="2" max="4096" class="input w-full">
+                </div>
+            </div>
+        </div>
+        <div class="form-control mt-4 border border-base-300 rounded-md">
+            <label class="label"><span class="label-text">Filters</span></label>
+            <div class="flex">
+                <div class="flex-1">
+                    <label class="label cursor-pointer justify-start gap-2">
+                        <span class="label-text">jpg</span> 
+                        <input data-value="jpg" type="checkbox" checked="checked" class="checkbox type-filter" />
+                    </label>
+                </div>
+                <div class="flex-1">
+                    <label class="label cursor-pointer justify-start gap-2">
+                        <span class="label-text">png</span> 
+                        <input data-value="png" type="checkbox" checked="checked" class="checkbox type-filter" />
+                    </label>
+                </div>
+                <div class="flex-1">
+                    <label class="label cursor-pointer justify-start gap-2">
+                        <span class="label-text">gif</span> 
+                        <input data-value="gif" type="checkbox" class="checkbox type-filter" />
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="m-2">
+            <button id="bRun" disabled class="btn btn-primary">Run</button>
+            <button id="bCancel" class="btn btn-ghost">Cancel</button>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -28,6 +28,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const original_fs_1 = require("original-fs");
 const path = __importStar(require("path"));
+const Batch_1 = require("./Batch");
+const _debug = false;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
@@ -51,7 +53,8 @@ const createURPWindow = () => {
         electron_1.ipcMain.removeAllListeners("HDRP_WINDOW");
     });
     _window.loadFile(path.join(__dirname, "urp.html"));
-    _window.webContents.openDevTools();
+    if (_debug)
+        _window.webContents.openDevTools();
 };
 const createMainWindow = () => {
     // Create the browser window.
@@ -91,9 +94,105 @@ const createMainWindow = () => {
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    if (_debug)
+        mainWindow.webContents.openDevTools();
 };
-electron_1.app.applicationMenu = electron_1.Menu.buildFromTemplate([]);
+const createResizeWindow = (parent) => {
+    const resizeWin = new electron_1.BrowserWindow({
+        width: 320,
+        height: 372,
+        useContentSize: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        },
+        parent: parent,
+        modal: true,
+        maximizable: false,
+        minimizable: false
+    });
+    electron_1.ipcMain.addListener("SELECT_FOLDER", (ev) => {
+        electron_1.dialog.showOpenDialog(resizeWin, {
+            title: "Select Folder",
+            properties: ["openDirectory"]
+        })
+            .then(res => {
+            if (res.canceled)
+                return;
+            ev.sender.send("SELECT_FOLDER", res.filePaths[0]);
+        })
+            .catch(console.error);
+    });
+    electron_1.ipcMain.addListener("BATCH_RESIZE", (ev, data) => {
+        (0, Batch_1.BatchResize)(data, (done, total) => {
+            ev.sender.send("UPDATE_PROGRESS", [done, total]);
+        })
+            .then(() => {
+            resizeWin.close();
+        })
+            .catch(console.error);
+    });
+    resizeWin.on('close', () => {
+        electron_1.ipcMain.removeAllListeners("SELECT_FOLDER");
+        electron_1.ipcMain.removeAllListeners("BATCH_RESIZE");
+    });
+    resizeWin.setMenu(electron_1.Menu.buildFromTemplate([]));
+    resizeWin.loadFile(path.join(__dirname, 'batchResize.html'));
+    if (_debug)
+        resizeWin.webContents.openDevTools();
+};
+const createFlipNormalsWindow = (parent) => {
+    const flipWin = new electron_1.BrowserWindow({
+        width: 320,
+        height: 123,
+        useContentSize: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        },
+        parent: parent,
+        modal: true,
+        maximizable: false,
+        minimizable: false
+    });
+    electron_1.ipcMain.addListener("SAVE_FIMAGES", (ev, data) => {
+        for (let i = 0; i < data.length; i++) {
+            const file = data[i];
+            const buffer = Buffer.from(file.buffer);
+            (0, original_fs_1.writeFileSync)(file.path, buffer, 'binary');
+            ev.sender.send("UPDATE_PROGRESS", i + 1);
+        }
+        setTimeout(() => {
+            flipWin.close();
+        }, 500);
+    });
+    flipWin.on('close', () => {
+        electron_1.ipcMain.removeAllListeners("SAVE_FIMAGES");
+    });
+    flipWin.setMenu(electron_1.Menu.buildFromTemplate([]));
+    flipWin.loadFile(path.join(__dirname, 'batchFlipNormals.html'));
+    if (_debug)
+        flipWin.webContents.openDevTools();
+};
+electron_1.app.applicationMenu = electron_1.Menu.buildFromTemplate([
+    {
+        'label': 'File',
+        'submenu': [
+            {
+                'label': "Batch Resize",
+                'click': (item, window, ev) => {
+                    createResizeWindow(window);
+                }
+            },
+            {
+                'label': "Flip Normals",
+                'click': (item, window, ev) => {
+                    createFlipNormalsWindow(window);
+                }
+            }
+        ]
+    }
+]);
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
