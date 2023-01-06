@@ -1,7 +1,7 @@
 // const { app, BrowserWindow } = require('electron');
 // const path = require('path');
 
-import {app, BrowserWindow, ipcMain, Menu, dialog, Event} from 'electron';
+import {app, BrowserWindow, ipcMain, Menu, dialog, Event, IpcMainEvent} from 'electron';
 import { createReadStream, writeFileSync } from 'original-fs';
 import * as path from 'path';
 import { BatchResize, ResizeData } from './Batch';
@@ -27,12 +27,39 @@ const createURPWindow = () => {
   });
 
   ipcMain.addListener("HDRP_WINDOW", ev => {
+    ipcMain.removeAllListeners("SAVE_IMAGE");
     createMainWindow();
     _window.close();
   });
 
+  ipcMain.addListener("SAVE_IMAGE", (ev, data) => {
+    
+    const buffer = Buffer.from(data);
+
+    dialog.showSaveDialog(_window, {
+      'filters': [
+        {
+          'name': 'PNG Image',
+          'extensions': ['png']
+        }
+      ]
+    })
+      .then((res) => {
+
+        if (res.canceled) return;
+
+        writeFileSync(res.filePath, buffer, 'binary');
+
+        ev.sender.send("RELOAD");
+
+      })
+      .catch(console.error);
+
+  });
+
   _window.on('close', () => {
     ipcMain.removeAllListeners("HDRP_WINDOW");
+    
   });
 
   _window.loadFile(path.join(__dirname, "urp.html"));
@@ -52,12 +79,13 @@ const createMainWindow = () => {
   });
 
   ipcMain.addListener("URP_WINDOW", ev => {
+    ipcMain.removeAllListeners("SAVE_IMAGE");
     createURPWindow();
     mainWindow.close();
   });
 
-  ipcMain.addListener('SAVE_IMAGE', (ev, data) => {
-
+  ipcMain.addListener("SAVE_IMAGE", (ev, data) => {
+    
     const buffer = Buffer.from(data);
 
     dialog.showSaveDialog(mainWindow, {
@@ -74,13 +102,14 @@ const createMainWindow = () => {
 
         writeFileSync(res.filePath, buffer, 'binary');
 
+        ev.sender.send("RELOAD");
+
       })
       .catch(console.error);
 
-  })
+  });
 
   mainWindow.on('close', () => {
-    // ipcMain.removeAllListeners("SAVE_IMAGE");
     ipcMain.removeAllListeners("URP_WINDOW");
   });
 
@@ -197,7 +226,7 @@ const createFlipNormalsWindow = (parent:BrowserWindow) => {
 
 app.applicationMenu = Menu.buildFromTemplate([
   {
-    'label': 'File',
+    'label': 'Tools',
     'submenu': [
       {
         'label': "Batch Resize",

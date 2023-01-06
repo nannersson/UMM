@@ -14,8 +14,8 @@
   },
   "keywords": [],
   "author": {
-    "name": "Nick",
-    "email": "nick@null"
+    "name": "Dataclash",
+    "email": "nick@dataclash.net"
   },
   "license": "MIT",
   "config": {
@@ -27,7 +27,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "app"
+            "name": "UnityMaskMapper"
           }
         },
         {

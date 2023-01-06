@@ -46,8 +46,27 @@ const createURPWindow = () => {
         }
     });
     electron_1.ipcMain.addListener("HDRP_WINDOW", ev => {
+        electron_1.ipcMain.removeAllListeners("SAVE_IMAGE");
         createMainWindow();
         _window.close();
+    });
+    electron_1.ipcMain.addListener("SAVE_IMAGE", (ev, data) => {
+        const buffer = Buffer.from(data);
+        electron_1.dialog.showSaveDialog(_window, {
+            'filters': [
+                {
+                    'name': 'PNG Image',
+                    'extensions': ['png']
+                }
+            ]
+        })
+            .then((res) => {
+            if (res.canceled)
+                return;
+            (0, original_fs_1.writeFileSync)(res.filePath, buffer, 'binary');
+            ev.sender.send("RELOAD");
+        })
+            .catch(console.error);
     });
     _window.on('close', () => {
         electron_1.ipcMain.removeAllListeners("HDRP_WINDOW");
@@ -67,10 +86,11 @@ const createMainWindow = () => {
         }
     });
     electron_1.ipcMain.addListener("URP_WINDOW", ev => {
+        electron_1.ipcMain.removeAllListeners("SAVE_IMAGE");
         createURPWindow();
         mainWindow.close();
     });
-    electron_1.ipcMain.addListener('SAVE_IMAGE', (ev, data) => {
+    electron_1.ipcMain.addListener("SAVE_IMAGE", (ev, data) => {
         const buffer = Buffer.from(data);
         electron_1.dialog.showSaveDialog(mainWindow, {
             'filters': [
@@ -84,11 +104,11 @@ const createMainWindow = () => {
             if (res.canceled)
                 return;
             (0, original_fs_1.writeFileSync)(res.filePath, buffer, 'binary');
+            ev.sender.send("RELOAD");
         })
             .catch(console.error);
     });
     mainWindow.on('close', () => {
-        // ipcMain.removeAllListeners("SAVE_IMAGE");
         electron_1.ipcMain.removeAllListeners("URP_WINDOW");
     });
     // and load the index.html of the app.
@@ -176,7 +196,7 @@ const createFlipNormalsWindow = (parent) => {
 };
 electron_1.app.applicationMenu = electron_1.Menu.buildFromTemplate([
     {
-        'label': 'File',
+        'label': 'Tools',
         'submenu': [
             {
                 'label': "Batch Resize",
